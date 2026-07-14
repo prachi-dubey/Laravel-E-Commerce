@@ -2,13 +2,14 @@
 
 namespace App\Repositories;
 
+use App\Constants\Pagination;
 use App\Interfaces\ProductAuditLogRepositoryInterface;
 use App\Models\ProductAuditLog;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ProductAuditLogRepository implements ProductAuditLogRepositoryInterface
 {
-    public function paginate(int $perPage = 15): LengthAwarePaginator
+    public function paginate(int $perPage = Pagination::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
         return ProductAuditLog::query()
             ->with(['product', 'user'])

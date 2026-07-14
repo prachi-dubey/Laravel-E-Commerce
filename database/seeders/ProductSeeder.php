@@ -4,15 +4,14 @@ namespace Database\Seeders;
 
 use App\Models\Product;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Schema;
 
 class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-        Schema::disableForeignKeyConstraints();
-        Product::truncate();
-        Schema::enableForeignKeyConstraints();
+        if (Product::query()->exists()) {
+            return;
+        }
 
         $products = [
             ['name' => 'Wireless Bluetooth Headphones', 'description' => 'Over-ear noise cancelling headphones with 30-hour battery life and deep bass.', 'price' => 129.99, 'stock' => 50],

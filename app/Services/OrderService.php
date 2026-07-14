@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Constants\Pagination;
 use App\Enums\OrderStatus;
 use App\Events\OrderPlaced;
 use App\Exceptions\CustomException;
@@ -22,12 +23,12 @@ class OrderService
         private readonly CartService $cartService,
     ) {}
 
-    public function listForUser(int $userId, int $perPage = 15): LengthAwarePaginator
+    public function listForUser(int $userId, int $perPage = Pagination::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
         return $this->orderRepository->paginateForUser($userId, $perPage);
     }
 
-    public function listAll(int $perPage = 15): LengthAwarePaginator
+    public function listAll(int $perPage = Pagination::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
         return $this->orderRepository->paginateAll($perPage);
     }

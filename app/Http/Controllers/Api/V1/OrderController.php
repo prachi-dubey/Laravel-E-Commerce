@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Constants\Pagination;
 use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\UpdateOrderStatusRequest;
@@ -19,7 +20,7 @@ class OrderController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $perPage = $request->integer('per_page', 15);
+        $perPage = $request->integer('per_page', Pagination::DEFAULT_PER_PAGE);
         $user = $request->user();
 
         $orders = $user->isAdmin()

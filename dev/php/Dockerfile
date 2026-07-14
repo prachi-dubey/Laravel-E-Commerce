@@ -41,20 +41,30 @@ COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 COPY .env.example .env
 COPY . /var/www/html
 
+# Install PHP dependencies
 RUN composer install --no-interaction --prefer-dist
 
+# Generate app key and clear caches (build-time)
 RUN php artisan key:generate --force \
     && php artisan route:clear \
-    && php artisan config:clear
+    && php artisan config:clear \
+    && php artisan storage:link || true
 
 RUN usermod -u 1000 www-data && \
     chown www-data /var/log/supervisor && \
     chown www-data /var/run && \
-    chown www-data /var/www/html/storage && \
-    chown www-data /var/www/html/bootstrap/cache
+    chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 COPY --chown=www-data:www-data . /var/www/html
+
+# Entrypoint runs migrate / seed / storage:link when the container starts
+# (MySQL is available then; it is not available during docker build)
+COPY dev/php/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 USER www-data
 
 VOLUME "/var/www/html"
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["php-fpm"]

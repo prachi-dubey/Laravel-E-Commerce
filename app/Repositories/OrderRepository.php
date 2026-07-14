@@ -2,13 +2,14 @@
 
 namespace App\Repositories;
 
+use App\Constants\Pagination;
 use App\Interfaces\OrderRepositoryInterface;
 use App\Models\Order;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class OrderRepository implements OrderRepositoryInterface
 {
-    public function paginateForUser(int $userId, int $perPage = 15): LengthAwarePaginator
+    public function paginateForUser(int $userId, int $perPage = Pagination::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
         return Order::query()
             ->with(['items.product'])
@@ -17,7 +18,7 @@ class OrderRepository implements OrderRepositoryInterface
             ->paginate($perPage);
     }
 
-    public function paginateAll(int $perPage = 15): LengthAwarePaginator
+    public function paginateAll(int $perPage = Pagination::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
         return Order::query()
             ->with(['items.product', 'user'])

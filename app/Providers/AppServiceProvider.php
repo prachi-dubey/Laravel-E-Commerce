@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Exceptions\Handler;
 use App\Interfaces\AuthRepositoryInterface;
 use App\Interfaces\CartRepositoryInterface;
 use App\Interfaces\OrderRepositoryInterface;
@@ -15,6 +16,7 @@ use App\Repositories\OrderRepository;
 use App\Repositories\ProductAuditLogRepository;
 use App\Repositories\ProductRepository;
 use Dedoc\Scramble\Scramble;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\App as AppFacade;
 use Illuminate\Support\ServiceProvider;
@@ -24,6 +26,9 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        // Use the project's custom exception Handler (Laravel 13 does not auto-bind it).
+        $this->app->singleton(ExceptionHandler::class, Handler::class);
+
         $this->app->bind(AuthRepositoryInterface::class, AuthRepository::class);
         $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
         $this->app->bind(ProductAuditLogRepositoryInterface::class, ProductAuditLogRepository::class);

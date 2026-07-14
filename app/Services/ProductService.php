@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Constants\Pagination;
 use App\Exceptions\CustomException;
 use App\Interfaces\ProductAuditLogRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
@@ -19,12 +20,12 @@ class ProductService
         private readonly ProductAuditLogRepositoryInterface $auditLogRepository,
     ) {}
 
-    public function list(int $perPage = 15): LengthAwarePaginator
+    public function list(int $perPage = Pagination::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
         return $this->productRepository->paginate($perPage);
     }
 
-    public function listAll(int $perPage = 15): LengthAwarePaginator
+    public function listAll(int $perPage = Pagination::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
         return Product::query()->withTrashed()->latest()->paginate($perPage);
     }

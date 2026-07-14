@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Constants\Pagination;
 use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\StoreProductRequest;
@@ -21,7 +22,7 @@ class ProductController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $perPage = $request->integer('per_page', 15);
+        $perPage = $request->integer('per_page', Pagination::DEFAULT_PER_PAGE);
         $products = $this->productService->list($perPage);
 
         return $this->successResponse(__('messages.success'), [
@@ -37,7 +38,7 @@ class ProductController extends Controller
 
     public function adminIndex(Request $request): JsonResponse
     {
-        $perPage = $request->integer('per_page', 15);
+        $perPage = $request->integer('per_page', Pagination::DEFAULT_PER_PAGE);
         $products = $this->productService->listAll($perPage);
 
         return $this->successResponse(__('messages.success'), [

@@ -74,6 +74,13 @@ CACHE_STORE=redis
 # or: docker compose up -d --build
 ```
 
+On startup the app container automatically runs:
+
+- `composer install` (also during image build)
+- `php artisan key:generate` (if `APP_KEY` is missing)
+- `php artisan migrate --seed`
+- `php artisan storage:link`
+
 This starts 5 services:
 
 | Service    | URL / Port              |
@@ -83,16 +90,7 @@ This starts 5 services:
 | MySQL      | localhost:3307          |
 | Redis      | localhost:6384          |
 
-### 4. Install dependencies and set up the database
-
-```bash
-docker compose exec app composer install
-docker compose exec app php artisan key:generate
-docker compose exec app php artisan migrate --seed
-docker compose exec app php artisan storage:link
-```
-
-### 5. Verify the API
+### 4. Verify the API
 
 ```bash
 curl http://localhost:84/api/v1/products
@@ -117,7 +115,9 @@ docker compose down           # stop
 docker compose logs -f app    # view app logs
 ```
 
-### Run Artisan commands
+### Useful Artisan commands (optional)
+
+These are already handled by Docker on startup. Use them only when you need to re-run manually:
 
 ```bash
 docker compose exec app php artisan migrate
@@ -227,7 +227,7 @@ brew install docker-compose
 mkdir -p ~/.docker/cli-plugins
 ln -sf "$(brew --prefix)/opt/docker-compose/bin/docker-compose" ~/.docker/cli-plugins/docker-compose
 
-# 3. Install Composer & dependencies (optional — can also run inside Docker)
+# 3. Optional — host Composer (dependencies also install inside Docker)
 brew install composer
 composer install
 ```

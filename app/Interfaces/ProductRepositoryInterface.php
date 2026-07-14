@@ -2,12 +2,13 @@
 
 namespace App\Interfaces;
 
+use App\Constants\Pagination;
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface ProductRepositoryInterface
 {
-    public function paginate(int $perPage = 15): LengthAwarePaginator;
+    public function paginate(int $perPage = Pagination::DEFAULT_PER_PAGE): LengthAwarePaginator;
 
     public function findById(int $id): ?Product;
 

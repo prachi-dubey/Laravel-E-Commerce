@@ -8,7 +8,7 @@ return [
     'unauthorized_access' => 'You are not authorized to perform this action.',
     'route_not_found' => 'Route not found.',
     'resource_not_found' => 'Resource not found.',
-    'method_not_allowed' => 'Method not allowed.',
+    'method_not_allowed' => 'Method not allowed. Please use the correct HTTP method.',
     'duplicate_entry' => 'Duplicate entry.',
     'database_error_occurred' => 'A database error occurred.',
     'server_error' => 'An unexpected server error occurred.',
