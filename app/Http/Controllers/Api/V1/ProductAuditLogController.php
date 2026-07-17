@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Constants\Pagination;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductAuditLogResource;
 use App\Services\ProductAuditLogService;
@@ -17,7 +16,7 @@ class ProductAuditLogController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $perPage = $request->integer('per_page', Pagination::DEFAULT_PER_PAGE);
+        $perPage = $request->integer('per_page', (int) config('constants.pagination.default_per_page'));
         $logs = $this->auditLogService->list($perPage);
 
         return $this->successResponse(__('messages.success'), [

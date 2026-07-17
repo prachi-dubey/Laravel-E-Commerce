@@ -11,10 +11,13 @@ class OrderResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'user' => new UserResource($this->whenLoaded('user')),
-            'status' => $this->status->value,
+            'user' => new UserResource($this->user),
+            'status' => [
+                'value' => $this->status->value,
+                'label' => $this->status->label(),
+            ],
             'total_amount' => $this->total_amount,
-            'items' => OrderItemResource::collection($this->whenLoaded('items')),
+            'items' => OrderItemResource::collection($this->items),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

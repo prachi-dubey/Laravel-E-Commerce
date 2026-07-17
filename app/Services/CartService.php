@@ -5,9 +5,7 @@ namespace App\Services;
 use App\Exceptions\CustomException;
 use App\Interfaces\CartRepositoryInterface;
 use App\Models\Cart;
-use App\Models\CartItem;
 use App\Models\Product;
-use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
 class CartService
@@ -29,7 +27,7 @@ class CartService
 
     public function addItem(int $userId, int $productId, int $quantity): Cart
     {
-        $product = Product::query()->where('is_active', true)->find($productId);
+        $product = Product::active()->find($productId);
 
         if (! $product) {
             throw new CustomException(__('messages.resource_not_found'), Response::HTTP_NOT_FOUND);
@@ -41,10 +39,7 @@ class CartService
 
         $cart = $this->cartRepository->getOrCreateForUser($userId);
 
-        $item = CartItem::query()
-            ->where('cart_id', $cart->id)
-            ->where('product_id', $productId)
-            ->first();
+        $item = $cart->items()->where('product_id', $productId)->first();
 
         if ($item) {
             $newQuantity = $item->quantity + $quantity;
@@ -68,16 +63,13 @@ class CartService
     {
         $cart = $this->cartRepository->getOrCreateForUser($userId);
 
-        $item = CartItem::query()
-            ->where('cart_id', $cart->id)
-            ->where('id', $itemId)
-            ->first();
+        $item = $cart->items()->where('id', $itemId)->first();
 
         if (! $item) {
             throw new CustomException(__('messages.resource_not_found'), Response::HTTP_NOT_FOUND);
         }
 
-        $product = Product::query()->find($item->product_id);
+        $product = $item->product;
 
         if (! $product || $product->stock < $quantity) {
             throw new CustomException(__('messages.insufficient_stock'), Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -92,10 +84,7 @@ class CartService
     {
         $cart = $this->cartRepository->getOrCreateForUser($userId);
 
-        $item = CartItem::query()
-            ->where('cart_id', $cart->id)
-            ->where('id', $itemId)
-            ->first();
+        $item = $cart->items()->where('id', $itemId)->first();
 
         if (! $item) {
             throw new CustomException(__('messages.resource_not_found'), Response::HTTP_NOT_FOUND);

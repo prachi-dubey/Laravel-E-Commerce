@@ -11,12 +11,9 @@ class CartItemResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'product' => new ProductResource($this->whenLoaded('product')),
+            'product' => new ProductResource($this->product),
             'quantity' => $this->quantity,
-            'subtotal' => $this->when(
-                $this->relationLoaded('product') && $this->product,
-                fn () => bcmul((string) $this->product->price, (string) $this->quantity, 2)
-            ),
+            'subtotal' => $this->subtotal,
         ];
     }
 }

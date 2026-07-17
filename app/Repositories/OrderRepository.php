@@ -2,35 +2,34 @@
 
 namespace App\Repositories;
 
-use App\Constants\Pagination;
 use App\Interfaces\OrderRepositoryInterface;
 use App\Models\Order;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class OrderRepository implements OrderRepositoryInterface
 {
-    public function paginateForUser(int $userId, int $perPage = Pagination::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function paginateForUser(int $userId, ?int $perPage = null): LengthAwarePaginator
     {
-        return Order::query()
-            ->with(['items.product'])
+        $perPage ??= (int) config('constants.pagination.default_per_page');
+
+        return Order::with(['items.product'])
             ->where('user_id', $userId)
             ->latest()
             ->paginate($perPage);
     }
 
-    public function paginateAll(int $perPage = Pagination::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function paginateAll(?int $perPage = null): LengthAwarePaginator
     {
-        return Order::query()
-            ->with(['items.product', 'user'])
+        $perPage ??= (int) config('constants.pagination.default_per_page');
+
+        return Order::with(['items.product', 'user'])
             ->latest()
             ->paginate($perPage);
     }
 
     public function findById(int $id): ?Order
     {
-        return Order::query()
-            ->with(['items.product', 'user'])
-            ->find($id);
+        return Order::with(['items.product', 'user'])->find($id);
     }
 
     public function create(array $data, array $items): Order

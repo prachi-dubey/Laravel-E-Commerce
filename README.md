@@ -21,7 +21,7 @@ Built with Laravel and Docker so you can run the full stack without installing P
 - **RBAC** — Admin and Customer roles with middleware
 - **Products** — CRUD, image upload, inventory, audit logs, Redis-cached listing
 - **Cart** — add, update, and remove items
-- **Orders** — place from cart with status workflow (`pending → confirmed → processing → shipped → delivered/cancelled`)
+- **Orders** — place from cart with status workflow (`placed → confirmed → processing → dispatched → delivered/cancelled`)
 - **Consistent JSON responses** — `{ "success": true, "message": "...", "data": {} }`
 - **API rate limiting** — 60 requests/minute
 
@@ -206,9 +206,9 @@ tests/Feature/          # Auth, Product, Cart, Order tests
 ## Order Status Workflow
 
 ```
-pending → confirmed → processing → shipped → delivered
-    ↓         ↓            ↓           ↓
- cancelled  cancelled   cancelled    (no cancel after shipped)
+placed → confirmed → processing → dispatched → delivered
+   ↓         ↓            ↓            ↓
+cancelled cancelled   cancelled     (no cancel after dispatched)
 ```
 
 ---

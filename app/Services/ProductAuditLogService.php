@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Constants\Pagination;
 use App\Interfaces\ProductAuditLogRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -12,8 +11,10 @@ class ProductAuditLogService
         private readonly ProductAuditLogRepositoryInterface $auditLogRepository,
     ) {}
 
-    public function list(int $perPage = Pagination::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function list(?int $perPage = null): LengthAwarePaginator
     {
+        $perPage ??= (int) config('constants.pagination.default_per_page');
+
         return $this->auditLogRepository->paginate($perPage);
     }
 }

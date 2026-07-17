@@ -26,7 +26,8 @@ class OrderTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJson(['success' => true])
-            ->assertJsonPath('data.status', OrderStatus::Pending->value);
+            ->assertJsonPath('data.status.value', OrderStatus::Placed->value)
+            ->assertJsonPath('data.status.label', OrderStatus::Placed->label());
 
         $this->assertDatabaseHas('orders', ['user_id' => $user->id]);
         $this->assertDatabaseHas('order_items', ['product_id' => $product->id, 'quantity' => 2]);
@@ -38,7 +39,7 @@ class OrderTest extends TestCase
         $user = $this->actingAsCustomer();
         Order::create([
             'user_id' => $user->id,
-            'status' => OrderStatus::Pending,
+            'status' => OrderStatus::Placed,
             'total_amount' => 50.00,
         ]);
 
@@ -55,7 +56,7 @@ class OrderTest extends TestCase
 
         Order::create([
             'user_id' => $customer->id,
-            'status' => OrderStatus::Pending,
+            'status' => OrderStatus::Placed,
             'total_amount' => 50.00,
         ]);
 
@@ -76,7 +77,7 @@ class OrderTest extends TestCase
         $this->actingAsAdmin();
         $order = Order::create([
             'user_id' => $this->createCustomer()->id,
-            'status' => OrderStatus::Pending,
+            'status' => OrderStatus::Placed,
             'total_amount' => 50.00,
         ]);
 
@@ -85,7 +86,8 @@ class OrderTest extends TestCase
         ]);
 
         $response->assertOk()
-            ->assertJsonPath('data.status', OrderStatus::Confirmed->value);
+            ->assertJsonPath('data.status.value', OrderStatus::Confirmed->value)
+            ->assertJsonPath('data.status.label', OrderStatus::Confirmed->label());
     }
 
     public function test_invalid_status_transition_is_rejected(): void
@@ -98,7 +100,7 @@ class OrderTest extends TestCase
         ]);
 
         $response = $this->patchJson("/api/v1/orders/{$order->id}/status", [
-            'status' => OrderStatus::Pending->value,
+            'status' => OrderStatus::Placed->value,
         ]);
 
         $response->assertStatus(422);

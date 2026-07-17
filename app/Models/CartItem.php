@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -18,6 +19,14 @@ class CartItem extends Model
         return [
             'quantity' => 'integer',
         ];
+    }
+
+    protected function subtotal(): Attribute
+    {
+        return Attribute::get(fn () => $this->product
+            ? bcmul((string) $this->product->price, (string) $this->quantity, 2)
+            : '0.00'
+        );
     }
 
     public function cart(): BelongsTo

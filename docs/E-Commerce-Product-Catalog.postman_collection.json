@@ -402,7 +402,7 @@
               "path": ["orders", "{{order_id}}", "status"]
             }
           },
-          "description": "Allowed status workflow: pending -> confirmed -> processing -> shipped -> delivered. Any non-final status can also go to cancelled."
+          "description": "Allowed status workflow: placed -> confirmed -> processing -> dispatched -> delivered. Any non-final status can also go to cancelled."
         }
       ]
     }

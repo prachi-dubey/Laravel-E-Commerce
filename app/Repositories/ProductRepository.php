@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Constants\Pagination;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -14,16 +13,16 @@ class ProductRepository implements ProductRepositoryInterface
 
     private const CACHE_TTL = 300;
 
-    public function paginate(int $perPage = Pagination::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function paginate(?int $perPage = null): LengthAwarePaginator
     {
-        $page = request()->integer('page', Pagination::DEFAULT_PAGE);
+        $perPage ??= (int) config('constants.pagination.default_per_page');
+        $page = request()->integer('page', (int) config('constants.pagination.default_page'));
         $version = Cache::get(self::CACHE_VERSION_KEY, 1);
 
         return Cache::remember(
             "products.list.v{$version}.page.{$page}.per.{$perPage}",
             self::CACHE_TTL,
-            fn () => Product::query()
-                ->where('is_active', true)
+            fn () => Product::active()
                 ->latest()
                 ->paginate($perPage)
         );
@@ -31,7 +30,7 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function findById(int $id): ?Product
     {
-        return Product::query()->find($id);
+        return Product::find($id);
     }
 
     public function create(array $data): Product

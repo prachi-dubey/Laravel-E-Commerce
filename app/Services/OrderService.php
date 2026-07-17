@@ -2,14 +2,12 @@
 
 namespace App\Services;
 
-use App\Constants\Pagination;
 use App\Enums\OrderStatus;
 use App\Events\OrderPlaced;
 use App\Exceptions\CustomException;
 use App\Interfaces\CartRepositoryInterface;
 use App\Interfaces\OrderRepositoryInterface;
 use App\Models\Order;
-use App\Models\Product;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -23,13 +21,17 @@ class OrderService
         private readonly CartService $cartService,
     ) {}
 
-    public function listForUser(int $userId, int $perPage = Pagination::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function listForUser(int $userId, ?int $perPage = null): LengthAwarePaginator
     {
+        $perPage ??= (int) config('constants.pagination.default_per_page');
+
         return $this->orderRepository->paginateForUser($userId, $perPage);
     }
 
-    public function listAll(int $perPage = Pagination::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function listAll(?int $perPage = null): LengthAwarePaginator
     {
+        $perPage ??= (int) config('constants.pagination.default_per_page');
+
         return $this->orderRepository->paginateAll($perPage);
     }
 
@@ -57,11 +59,13 @@ class OrderService
         }
 
         return DB::transaction(function () use ($user, $cart) {
+            $cart->load('items.product');
+
             $total = 0;
             $orderItems = [];
 
             foreach ($cart->items as $item) {
-                $product = Product::query()->lockForUpdate()->find($item->product_id);
+                $product = $item->product()->lockForUpdate()->first();
 
                 if (! $product || ! $product->is_active) {
                     throw new CustomException(
@@ -92,7 +96,7 @@ class OrderService
 
             $order = $this->orderRepository->create([
                 'user_id' => $user->id,
-                'status' => OrderStatus::Pending->value,
+                'status' => OrderStatus::Placed->value,
                 'total_amount' => $total,
             ], $orderItems);
 
@@ -128,10 +132,10 @@ class OrderService
 
     private function restoreStock(Order $order): void
     {
+        $order->load('items.product');
+
         foreach ($order->items as $item) {
-            Product::query()
-                ->where('id', $item->product_id)
-                ->increment('stock', $item->quantity);
+            $item->product?->increment('stock', $item->quantity);
         }
     }
 }
