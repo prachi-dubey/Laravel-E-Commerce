@@ -145,12 +145,15 @@
             "method": "GET",
             "header": [{ "key": "Accept", "value": "application/json" }],
             "url": {
-              "raw": "{{base_url}}/products?per_page=15&page=1",
+              "raw": "{{base_url}}/products?per_page=15&page=1&name=wireless&min_price=50&max_price=150",
               "host": ["{{base_url}}"],
               "path": ["products"],
               "query": [
                 { "key": "per_page", "value": "15" },
-                { "key": "page", "value": "1" }
+                { "key": "page", "value": "1" },
+                { "key": "name", "value": "wireless", "description": "Partial name search" },
+                { "key": "min_price", "value": "50", "description": "Minimum price filter" },
+                { "key": "max_price", "value": "150", "description": "Maximum price filter" }
               ]
             }
           }
@@ -174,10 +177,15 @@
             "method": "GET",
             "header": [{ "key": "Accept", "value": "application/json" }],
             "url": {
-              "raw": "{{base_url}}/admin/products?per_page=15",
+              "raw": "{{base_url}}/admin/products?per_page=15&name=wireless&min_price=50&max_price=150",
               "host": ["{{base_url}}"],
               "path": ["admin", "products"],
-              "query": [{ "key": "per_page", "value": "15" }]
+              "query": [
+                { "key": "per_page", "value": "15" },
+                { "key": "name", "value": "wireless", "description": "Partial name search" },
+                { "key": "min_price", "value": "50", "description": "Minimum price filter" },
+                { "key": "max_price", "value": "150", "description": "Maximum price filter" }
+              ]
             }
           }
         },

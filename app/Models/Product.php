@@ -35,6 +35,26 @@ class Product extends Model
         return $query->where('is_active', true);
     }
 
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    public function scopeSearch(Builder $query, array $filters): Builder
+    {
+        if (! empty($filters['name'])) {
+            $query->where('name', 'like', '%'.$filters['name'].'%');
+        }
+
+        if (isset($filters['min_price'])) {
+            $query->where('price', '>=', $filters['min_price']);
+        }
+
+        if (isset($filters['max_price'])) {
+            $query->where('price', '<=', $filters['max_price']);
+        }
+
+        return $query;
+    }
+
     public function auditLogs(): HasMany
     {
         return $this->hasMany(ProductAuditLog::class);

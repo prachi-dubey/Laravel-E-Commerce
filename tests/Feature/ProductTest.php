@@ -22,6 +22,39 @@ class ProductTest extends TestCase
             ]);
     }
 
+    public function test_anyone_can_search_products_by_name(): void
+    {
+        Product::factory()->create(['name' => 'Wireless Bluetooth Headphones', 'price' => 129.99]);
+        Product::factory()->create(['name' => 'Smart Fitness Watch', 'price' => 89.99]);
+
+        $response = $this->getJson('/api/v1/products?name=wireless');
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'data.products')
+            ->assertJsonPath('data.products.0.name', 'Wireless Bluetooth Headphones');
+    }
+
+    public function test_anyone_can_search_products_by_price_range(): void
+    {
+        Product::factory()->create(['name' => 'Budget Mouse', 'price' => 24.99]);
+        Product::factory()->create(['name' => 'Premium Monitor', 'price' => 299.00]);
+        Product::factory()->create(['name' => 'Mid Keyboard', 'price' => 69.99]);
+
+        $response = $this->getJson('/api/v1/products?min_price=50&max_price=150');
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'data.products')
+            ->assertJsonPath('data.products.0.name', 'Mid Keyboard');
+    }
+
+    public function test_product_search_validates_price_range(): void
+    {
+        $response = $this->getJson('/api/v1/products?min_price=100&max_price=50');
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['max_price']);
+    }
+
     public function test_anyone_can_view_single_product(): void
     {
         $product = Product::factory()->create();

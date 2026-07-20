@@ -13,16 +13,19 @@ class ProductRepository implements ProductRepositoryInterface
 
     private const CACHE_TTL = 300;
 
-    public function paginate(?int $perPage = null): LengthAwarePaginator
+    public function paginate(?int $perPage = null, array $filters = []): LengthAwarePaginator
     {
         $perPage ??= (int) config('constants.pagination.default_per_page');
         $page = request()->integer('page', (int) config('constants.pagination.default_page'));
         $version = Cache::get(self::CACHE_VERSION_KEY, 1);
+        ksort($filters);
+        $filterKey = md5(json_encode($filters));
 
         return Cache::remember(
-            "products.list.v{$version}.page.{$page}.per.{$perPage}",
+            "products.list.v{$version}.page.{$page}.per.{$perPage}.filters.{$filterKey}",
             self::CACHE_TTL,
             fn () => Product::active()
+                ->search($filters)
                 ->latest()
                 ->paginate($perPage)
         );

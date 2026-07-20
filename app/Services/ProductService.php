@@ -19,18 +19,27 @@ class ProductService
         private readonly ProductAuditLogRepositoryInterface $auditLogRepository,
     ) {}
 
-    public function list(?int $perPage = null): LengthAwarePaginator
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    public function list(?int $perPage = null, array $filters = []): LengthAwarePaginator
     {
         $perPage ??= (int) config('constants.pagination.default_per_page');
 
-        return $this->productRepository->paginate($perPage);
+        return $this->productRepository->paginate($perPage, $filters);
     }
 
-    public function listAll(?int $perPage = null): LengthAwarePaginator
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    public function listAll(?int $perPage = null, array $filters = []): LengthAwarePaginator
     {
         $perPage ??= (int) config('constants.pagination.default_per_page');
 
-        return Product::withTrashed()->latest()->paginate($perPage);
+        return Product::withTrashed()
+            ->search($filters)
+            ->latest()
+            ->paginate($perPage);
     }
 
     public function show(int $id): Product

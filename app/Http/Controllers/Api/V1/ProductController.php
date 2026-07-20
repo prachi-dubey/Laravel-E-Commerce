@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\ListProductsRequest;
 use App\Http\Requests\Api\StoreProductRequest;
 use App\Http\Requests\Api\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
@@ -19,10 +20,10 @@ class ProductController extends Controller
         private readonly ProductService $productService,
     ) {}
 
-    public function index(Request $request): JsonResponse
+    public function index(ListProductsRequest $request): JsonResponse
     {
         $perPage = $request->integer('per_page', (int) config('constants.pagination.default_per_page'));
-        $products = $this->productService->list($perPage);
+        $products = $this->productService->list($perPage, $request->filters());
 
         return $this->successResponse(__('messages.success'), [
             'products' => ProductResource::collection($products),
@@ -35,10 +36,10 @@ class ProductController extends Controller
         ]);
     }
 
-    public function adminIndex(Request $request): JsonResponse
+    public function adminIndex(ListProductsRequest $request): JsonResponse
     {
         $perPage = $request->integer('per_page', (int) config('constants.pagination.default_per_page'));
-        $products = $this->productService->listAll($perPage);
+        $products = $this->productService->listAll($perPage, $request->filters());
 
         return $this->successResponse(__('messages.success'), [
             'products' => ProductResource::collection($products),
